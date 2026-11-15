@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gather – מה קורה בירושלים</title>
+  <meta name="description" content="כל אירועי התרבות והפנאי בירושלים במקום אחד – ברשימה או על המפה.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a href="#/" class="logo">Gather<span>ירושלים</span></a>
+    <a href="#/post" class="btn btn-ghost">+ פרסום אירוע</a>
+  </header>
+
+  <main id="app">
+    <!-- Main screen: filter + list/map -->
+    <section id="screen-main" class="screen">
+      <div class="controls">
+        <div class="chips" role="tablist" aria-label="סינון לפי תאריך">
+          <button class="chip" data-filter="today">היום</button>
+          <button class="chip" data-filter="week">השבוע</button>
+          <button class="chip" data-filter="weekend">סוף השבוע</button>
+          <button class="chip" data-filter="upcoming">כל הקרובים</button>
+        </div>
+        <div class="toggle" role="tablist" aria-label="תצוגה">
+          <button class="toggle-btn" data-view="list">רשימה</button>
+          <button class="toggle-btn" data-view="map">מפה</button>
+        </div>
+      </div>
+      <p id="notice" class="notice" hidden></p>
+      <div id="list" class="list"></div>
+      <div id="map" class="map" hidden></div>
+    </section>
+
+    <!-- Event page -->
+    <section id="screen-event" class="screen" hidden></section>
+
+    <!-- Private posting form -->
+    <section id="screen-post" class="screen" hidden>
+      <a href="#/" class="back">→ חזרה</a>
+      <h1>פרסום אירוע פרטי</h1>
+      <p class="muted">מוכרים בחצר? מעבירים סדנה בבית? ג'אם בסלון? ספרו לנו. האירוע יפורסם לאחר אישור הצוות.</p>
+      <form id="post-form" novalidate>
+        <label>שם האירוע *<input name="title" required maxlength="120"></label>
+        <div class="row">
+          <label>תאריך *<input type="date" name="date" required></label>
+          <label>שעת התחלה *<input type="time" name="start" required></label>
+          <label>שעת סיום<input type="time" name="end"></label>
+        </div>
+        <label>כתובת או מקום *<input name="address" list="venue-list" required maxlength="160" placeholder="לדוגמה: רחוב הגפן 5, נחלאות"></label>
+        <datalist id="venue-list"></datalist>
+        <div class="field">
+          <span>סמנו את המיקום על המפה *</span>
+          <div id="pick-map" class="pick-map"></div>
+          <small class="warn">⚠️ הנקודה שתסמנו תוצג לכולם. אם זה בית פרטי, אפשר לסמן את קצה הרחוב במקום את הבית עצמו.</small>
+        </div>
+        <label>תיאור קצר *<textarea name="description" required maxlength="600" rows="4"></textarea></label>
+        <fieldset class="field">
+          <legend>מחיר</legend>
+          <label class="inline"><input type="radio" name="price" value="free" checked> חינם</label>
+          <label class="inline"><input type="radio" name="price" value="paid"> בתשלום</label>
+        </fieldset>
+        <div id="paid-fields" hidden>
+          <label>מחיר<input name="price_text" maxlength="40" placeholder="לדוגמה: 40 ₪"></label>
+          <label>קישור לתשלום (Bit / PayBox)<input type="url" name="payment_link" placeholder="https://"></label>
+        </div>
+        <label>טלפון או אימייל ליצירת קשר (לא יוצג באתר) *<input name="contact" required maxlength="120"></label>
+        <p id="form-error" class="error" hidden></p>
+        <button type="submit" class="btn btn-primary">שליחה לאישור</button>
+      </form>
+      <div id="post-done" class="done" hidden></div>
+    </section>
+  </main>
+
+  <footer class="footer">Gather · פרויקט קורס · <a href="#/post">יש לכם אירוע?</a></footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/dates.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- Analytics (free): create a site at goatcounter.com and replace YOURCODE, then uncomment.
+  <script data-goatcounter="https://YOURCODE.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  -->
+</body>
+</html>

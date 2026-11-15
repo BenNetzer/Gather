@@ -1,0 +1,74 @@
+[
+  {
+    "title": "ערב שירה פתוח",
+    "date": null,
+    "start_time": "20:00",
+    "end_time": null,
+    "venue_text": "בית הנסן",
+    "source_url": "https://hansen.co.il/events/",
+    "source_name": "בית הנסן",
+    "is_free": true,
+    "price_text": "",
+    "source_text": "ערב שירה פתוח | בית הנסן | 20:00 | כניסה חופשית"
+  },
+  {
+    "title": "הופעה חיה: אינדי מקומי",
+    "date": "2026-11-20",
+    "start_time": "21:30",
+    "end_time": null,
+    "venue_text": "הצוללת הצהובה",
+    "source_url": "https://example.org/listing",
+    "source_name": "מקור בדיקה",
+    "is_free": false,
+    "price_text": "60 ₪",
+    "source_text": "הופעה חיה - אינדי מקומי, יום שישי 20.11.26 בשעה 21:30, כרטיסים 60 ₪"
+  },
+  {
+    "title": "הבדחן",
+    "date": "2026-11-16",
+    "start_time": "18:00",
+    "end_time": "19:45",
+    "venue_text": "סינמטק 3",
+    "source_url": "https://jer-cin.org.il/he/article/4285?date=2026-11-16",
+    "source_name": "סינמטק ירושלים",
+    "is_free": null,
+    "price_text": "",
+    "source_text": "יום שני 16.11.26 18:00 הַבַּדְחָן הקרנה רגילה סינמטק 3"
+  },
+  {
+    "title": "הבדחן",
+    "date": "2026-11-16",
+    "start_time": "18:00",
+    "end_time": null,
+    "venue_text": "Jerusalem Cinematheque",
+    "source_url": "https://example.org/whats-on",
+    "source_name": "מקור שני",
+    "is_free": false,
+    "price_text": "42 ₪",
+    "source_text": "\"הבדחן\" – 16/11 at 18:00, Jerusalem Cinematheque. 42 ₪"
+  },
+  {
+    "title": "ערב ג'אם פתוח",
+    "date": "2026-11-20",
+    "start_time": "12:00",
+    "end_time": null,
+    "venue_text": "בית הנסן",
+    "source_url": "https://hansen.co.il/events/",
+    "source_name": "בית הנסן",
+    "is_free": true,
+    "price_text": "כניסה חופשית",
+    "source_text": "ערב ג׳אם פתוח · יום שישי, 20 בנובמבר 2026 · 12:00 · בבית הנסן · כניסה חופשית"
+  },
+  {
+    "title": "מסיבת גג",
+    "date": "2026-11-21",
+    "start_time": "22:00",
+    "end_time": null,
+    "venue_text": "גג המשביר",
+    "source_url": "https://example.org/listing",
+    "source_name": "מקור בדיקה",
+    "is_free": null,
+    "price_text": "",
+    "source_text": "מסיבת גג במוצאי שבת 21.11 22:00, גג המשביר"
+  }
+]

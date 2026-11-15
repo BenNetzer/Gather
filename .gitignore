@@ -2,3 +2,8 @@
 !/.gitignore
 !/CLAUDE.md
 !/UX UI/
+!/gather/
+gather/pipeline/out/
+__pycache__/
+*.pyc
+.env

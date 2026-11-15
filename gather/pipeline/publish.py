@@ -1,0 +1,170 @@
+"""Publish a reviewed staging file.
+
+Supabase mode (env SUPABASE_URL + SUPABASE_SERVICE_KEY set):
+    upsert rows into public.events on dedup_key (status active), then mark past events 'past'.
+Demo mode (env vars missing):
+    merge into gather/data/events.json by dedup_key (status active), then mark past events 'past'.
+
+Usage:
+    python gather/pipeline/publish.py gather/pipeline/out/staging-2026-11-15.json
+Options:
+    --allow-unmatched   also publish events whose venue was not matched (no coordinates)
+    --dry-run           show what would be published, change nothing
+    --events PATH       demo-mode target (default: gather/data/events.json)
+
+Per event in the staging file:
+    "status": "rejected" or "skip"  → not published
+    "status": "cancelled"           → published as cancelled
+    anything else (draft/active)    → published as active
+"""
+import argparse
+import hashlib
+import json
+import os
+import sys
+import urllib.error
+import urllib.parse
+import urllib.request
+from datetime import timedelta
+
+from common import DATA, now_utc, parse_iso_dt, read_json, utf8_stdout, write_json
+
+# Columns of public.events that the pipeline writes (see gather/supabase/schema.sql).
+COLUMNS = ["title", "description", "start_time", "end_time", "venue_name", "address", "lat", "lng",
+           "source_url", "source_name", "origin", "is_free", "price_text", "payment_link",
+           "status", "dedup_key"]
+SKIP_STATUSES = {"rejected", "skip"}
+PAST_GRACE = timedelta(hours=6)  # no end_time → treat as over 6h after start
+
+
+def select_rows(staging, allow_unmatched):
+    rows, skipped = [], []
+    for e in staging:
+        status = (e.get("status") or "draft").lower()
+        if status in SKIP_STATUSES:
+            skipped.append((e.get("title"), "status " + status))
+            continue
+        if e.get("lat") is None and not allow_unmatched:
+            skipped.append((e.get("title"), "unmatched venue (use --allow-unmatched or fill lat/lng)"))
+            continue
+        if not e.get("dedup_key") or not e.get("title") or not e.get("start_time"):
+            skipped.append((e.get("title"), "missing title/start_time/dedup_key"))
+            continue
+        row = {k: e.get(k) for k in COLUMNS}
+        row["status"] = "cancelled" if status == "cancelled" else "active"
+        row["origin"] = row["origin"] or "collected"
+        row["_id"] = e.get("id")
+        rows.append(row)
+    return rows, skipped
+
+
+def is_past(ev, now):
+    end = parse_iso_dt(ev.get("end_time"))
+    start = parse_iso_dt(ev.get("start_time"))
+    if end:
+        return end < now
+    return bool(start) and start + PAST_GRACE < now
+
+
+# ---------------------------------------------------------------------------
+# Demo mode: data/events.json
+# ---------------------------------------------------------------------------
+def publish_demo(rows, events_path, now=None):
+    events = read_json(events_path, []) or []
+    index = {e.get("dedup_key"): i for i, e in enumerate(events) if e.get("dedup_key")}
+    added = updated = 0
+    for r in rows:
+        r = dict(r)
+        rid = r.pop("_id", None)
+        i = index.get(r["dedup_key"])
+        if i is not None:
+            old = events[i]
+            old.update({k: v for k, v in r.items() if v is not None or k not in old})
+            updated += 1
+        else:
+            r["id"] = rid or "c-" + hashlib.sha1(r["dedup_key"].encode("utf-8")).hexdigest()[:12]
+            events.append({"id": r.pop("id"), **r})
+            index[r["dedup_key"]] = len(events) - 1
+            added += 1
+    now = now or now_utc()
+    past = 0
+    for e in events:
+        if e.get("status") == "active" and is_past(e, now):
+            e["status"] = "past"
+            past += 1
+    events.sort(key=lambda e: e.get("start_time") or "")
+    write_json(events_path, events)
+    return added, updated, past
+
+
+# ---------------------------------------------------------------------------
+# Supabase mode
+# ---------------------------------------------------------------------------
+def _request(method, url, key, body=None, prefer=None):
+    headers = {"apikey": key, "Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+    if prefer:
+        headers["Prefer"] = prefer
+    data = json.dumps(body, ensure_ascii=False).encode("utf-8") if body is not None else None
+    req = urllib.request.Request(url, data=data, method=method, headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as res:
+            txt = res.read().decode("utf-8")
+            return json.loads(txt) if txt.strip() else None
+    except urllib.error.HTTPError as err:
+        raise SystemExit(f"Supabase {method} {err.code}: {err.read().decode('utf-8', 'replace')}")
+
+
+def publish_supabase(rows, base, key):
+    base = base.rstrip("/") + "/rest/v1/events"
+    payload = []
+    for r in rows:
+        r = dict(r)
+        r.pop("_id", None)  # id is a uuid generated by the DB; dedup_key is the conflict target
+        payload.append(r)
+    if payload:
+        _request("POST", base + "?on_conflict=dedup_key", key, payload,
+                 prefer="resolution=merge-duplicates,return=minimal")
+    # Mark past: rows with end_time in the past, or no end_time and start_time older than the grace.
+    now = now_utc()
+    q_end = urllib.parse.quote((now).isoformat())
+    q_start = urllib.parse.quote((now - PAST_GRACE).isoformat())
+    r1 = _request("PATCH", f"{base}?status=eq.active&end_time=lt.{q_end}&select=id", key,
+                  {"status": "past"}, prefer="return=representation") or []
+    r2 = _request("PATCH", f"{base}?status=eq.active&end_time=is.null&start_time=lt.{q_start}&select=id",
+                  key, {"status": "past"}, prefer="return=representation") or []
+    return len(payload), len(r1) + len(r2)
+
+
+def main(argv=None):
+    utf8_stdout()
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("staging")
+    ap.add_argument("--allow-unmatched", action="store_true")
+    ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--events", default=str(DATA / "events.json"))
+    a = ap.parse_args(argv)
+
+    staging = read_json(a.staging)
+    if not isinstance(staging, list):
+        raise SystemExit(f"{a.staging}: expected a JSON array (a staging file from process.py)")
+    rows, skipped = select_rows(staging, a.allow_unmatched)
+    for title, why in skipped:
+        print(f"  skip: {title} — {why}")
+
+    url, key = os.environ.get("SUPABASE_URL"), os.environ.get("SUPABASE_SERVICE_KEY")
+    mode = "supabase" if url and key else "demo"
+    print(f"Mode: {mode}. {len(rows)} to publish, {len(skipped)} skipped.")
+    if a.dry_run:
+        for r in rows:
+            print(f"  would publish: {r['start_time']}  {r['title']} @ {r['venue_name']}")
+        return
+    if mode == "supabase":
+        n, past = publish_supabase(rows, url, key)
+        print(f"Upserted {n} rows to Supabase; marked {past} past.")
+    else:
+        added, updated, past = publish_demo(rows, a.events)
+        print(f"events.json: +{added} new, {updated} updated, {past} marked past → {a.events}")
+
+
+if __name__ == "__main__":
+    sys.exit(main())

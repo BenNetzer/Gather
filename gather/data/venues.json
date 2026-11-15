@@ -1,0 +1,18 @@
+[
+  {"name": "הצוללת הצהובה", "aliases": ["Yellow Submarine", "הצוללת"], "address": "הרכבים 13, תלפיות", "lat": 31.7540, "lng": 35.2143},
+  {"name": "סינמטק ירושלים", "aliases": ["Jerusalem Cinematheque", "הסינמטק"], "address": "דרך חברון 11", "lat": 31.7697, "lng": 35.2277},
+  {"name": "בית הנסן", "aliases": ["Hansen House", "הנסן"], "address": "גדליהו אלון 14, טלביה", "lat": 31.7686, "lng": 35.2176},
+  {"name": "הספרייה הלאומית", "aliases": ["National Library", "הספריה הלאומית"], "address": "אליעזר קפלן 1", "lat": 31.7790, "lng": 35.2040},
+  {"name": "שוק מחנה יהודה", "aliases": ["Mahane Yehuda", "מחנה יהודה", "השוק"], "address": "מחנה יהודה", "lat": 31.7852, "lng": 35.2121},
+  {"name": "גן סאקר", "aliases": ["Sacher Park", "פארק סאקר"], "address": "גן סאקר", "lat": 31.7820, "lng": 35.2050},
+  {"name": "התחנה הראשונה", "aliases": ["First Station", "התחנה"], "address": "דוד רמז 4", "lat": 31.7663, "lng": 35.2247},
+  {"name": "בית אבי חי", "aliases": ["Beit Avi Chai"], "address": "המלך ג'ורג' 44", "lat": 31.7765, "lng": 35.2166},
+  {"name": "מוזיאון ישראל", "aliases": ["Israel Museum"], "address": "דרך רופין 11", "lat": 31.7724, "lng": 35.2042},
+  {"name": "כיכר ספרא", "aliases": ["Safra Square"], "address": "כיכר ספרא 1", "lat": 31.7785, "lng": 35.2221},
+  {"name": "גן הפעמון", "aliases": ["Liberty Bell Park", "גן הפעמון ירושלים"], "address": "גן הפעמון, טלביה", "lat": 31.7680, "lng": 35.2220},
+  {"name": "המושבה הגרמנית - עמק רפאים", "aliases": ["עמק רפאים", "Emek Refaim", "המושבה הגרמנית"], "address": "עמק רפאים", "lat": 31.7627, "lng": 35.2192},
+  {"name": "האוניברסיטה העברית - הר הצופים", "aliases": ["הר הצופים", "Mount Scopus"], "address": "הר הצופים", "lat": 31.7940, "lng": 35.2425},
+  {"name": "האוניברסיטה העברית - גבעת רם", "aliases": ["גבעת רם", "Givat Ram", "קמפוס אדמונד ספרא"], "address": "קמפוס גבעת רם", "lat": 31.7765, "lng": 35.1980},
+  {"name": "מתחם בצלאל - מרכז העיר", "aliases": ["בצלאל"], "address": "בצלאל, מרכז העיר", "lat": 31.7810, "lng": 35.2140},
+  {"name": "נחלאות - כיכר הנרייטה", "aliases": ["נחלאות"], "address": "נחלאות", "lat": 31.7828, "lng": 35.2090}
+]

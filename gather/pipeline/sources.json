@@ -1,0 +1,45 @@
+[
+  {
+    "id": "jer-cin",
+    "name": "סינמטק ירושלים",
+    "enabled": true,
+    "url": "https://jer-cin.org.il/he/article/4285",
+    "url_pattern": "https://jer-cin.org.il/he/article/4285?date={YYYY-MM-DD}",
+    "default_venue": "סינמטק ירושלים",
+    "checked": "2026-11-15",
+    "notes": "Public, no login. Server-rendered day view: one day per page, items show title, DD.MM.YY date, HH:MM time and hall (סינמטק 1/2/3). Prices appear only on some items (e.g. 75 ₪ / 50 ₪ for subscribers); most screenings show no price, so leave price_text empty. Fetch today plus the next 6 days via ?date=. Hall names ('סינמטק 3') are the venue text and match the alias 'הסינמטק'/'סינמטק ירושלים'. Monthly program: https://jer-cin.org.il/he/node/4285"
+  },
+  {
+    "id": "hansen",
+    "name": "בית הנסן",
+    "enabled": true,
+    "url": "https://hansen.co.il/events/",
+    "default_venue": "בית הנסן",
+    "checked": "2026-11-15",
+    "notes": "Public, HTTP 200 (also via WebFetch on https://www.hansen.co.il/). Lists events and exhibitions, each with a page at https://hansen.co.il/event/<slug>/. Single events have a date and time (e.g. a workshop Fri 20.11.2026 12:00). Many items are exhibitions with a date range and no time; per the extraction rules, skip ranges with no explicit start time. No per-event prices; the page says building entry is free, so only set is_free when the event text says so. Some dates contain typos (an end date before its start date); skip those."
+  },
+  {
+    "id": "jerusalem-muni",
+    "name": "עיריית ירושלים – אירועים בירושלים",
+    "enabled": false,
+    "url": "https://www.jerusalem.muni.il/he/experience/lobbyevents/",
+    "checked": "2026-11-15",
+    "notes": "Public page (the old /he/events/ URL is a 404), but it blocks non-browser clients: WebFetch and Invoke-WebRequest both get HTTP 403. In a real browser the page loads, but the event cards are rendered by JavaScript behind filters (היום/מחר/שבוע הבא); only a featured banner showed in static text (חנוכה בירושלים 06.12-12.12.26). Not parseable by WebFetch, so it stays disabled. Enable it only if the collector uses a browser tool and reads the list after it renders."
+  },
+  {
+    "id": "nli",
+    "name": "הספרייה הלאומית",
+    "enabled": false,
+    "url": "https://www.nli.org.il/he/events",
+    "checked": "2026-11-15",
+    "notes": "Behind a Cloudflare browser challenge ('Checking your browser...', HTTP 403) for WebFetch, PowerShell and an automated browser. Do not try to bypass it. Disabled."
+  },
+  {
+    "id": "first-station",
+    "name": "התחנה הראשונה",
+    "enabled": false,
+    "url": "https://www.firststation.co.il/",
+    "checked": "2026-11-15",
+    "notes": "DNS did not resolve (EAI_AGAIN / 'remote name could not be resolved') for either www. or the bare domain on 2026-11-15. Re-check later; disabled for now."
+  }
+]
