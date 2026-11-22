@@ -2,37 +2,68 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Gather – מה קורה בירושלים</title>
   <meta name="description" content="כל אירועי התרבות והפנאי בירושלים במקום אחד – ברשימה או על המפה.">
+  <meta name="theme-color" content="#FBF9F5">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Rubik:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header class="topbar">
-    <a href="#/" class="logo">Gather<span>ירושלים</span></a>
-    <a href="#/post" class="btn btn-ghost">+ פרסום אירוע</a>
+    <a href="#/" class="topbar-back" id="topbar-back" aria-label="חזרה לאירועים" hidden>
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+    <a href="#/" class="brand" aria-label="Gather – לעמוד הראשי">
+      <span class="brand-mark" aria-hidden="true">G</span>
+      <span class="brand-text">
+        <span class="brand-row">
+          <span class="brand-name">Gather</span>
+          <span class="brand-section" id="brand-section">גלו</span>
+        </span>
+        <span class="brand-city">ירושלים</span>
+      </span>
+    </a>
   </header>
 
   <main id="app">
     <!-- Main screen: filter + list/map -->
     <section id="screen-main" class="screen">
-      <p id="greeting" class="greeting"></p>
+      <div class="hero">
+        <p id="greeting" class="greeting"></p>
+        <h1 class="hero-title">מה קורה בירושלים</h1>
+      </div>
+
       <div class="controls">
-        <div class="chips" role="tablist" aria-label="סינון לפי תאריך">
-          <button class="chip" data-filter="today">היום</button>
-          <button class="chip" data-filter="week">השבוע</button>
-          <button class="chip" data-filter="weekend">סוף השבוע</button>
-          <button class="chip" data-filter="upcoming">כל הקרובים</button>
+        <div class="segmented" role="tablist" aria-label="תצוגה">
+          <button class="segmented-btn toggle-btn" data-view="list" role="tab">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>
+            רשימה
+          </button>
+          <button class="segmented-btn toggle-btn" data-view="map" role="tab">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg>
+            מפה
+          </button>
         </div>
-        <div class="toggle" role="tablist" aria-label="תצוגה">
-          <button class="toggle-btn" data-view="list">רשימה</button>
-          <button class="toggle-btn" data-view="map">מפה</button>
+        <div class="pills" role="tablist" aria-label="סינון לפי תאריך">
+          <button class="pill chip" data-filter="today" role="tab">היום</button>
+          <button class="pill chip" data-filter="week" role="tab">השבוע</button>
+          <button class="pill chip" data-filter="weekend" role="tab">סוף השבוע</button>
+          <button class="pill chip" data-filter="upcoming" role="tab">כל הקרובים</button>
+          <span class="pills-sep" aria-hidden="true"></span>
+          <button class="pill pill-toggle" id="free-only" aria-pressed="false">חינם בלבד</button>
         </div>
       </div>
+
       <p id="notice" class="notice" hidden></p>
       <div id="list" class="list"></div>
-      <div id="map" class="map" hidden></div>
+      <div id="map-wrap" class="map-wrap" hidden>
+        <div id="map" class="map"></div>
+        <div id="map-card" class="map-card" hidden></div>
+      </div>
     </section>
 
     <!-- Event page -->
@@ -40,42 +71,118 @@
 
     <!-- Private posting form -->
     <section id="screen-post" class="screen" hidden>
-      <a href="#/" class="back">→ חזרה</a>
-      <h1>פרסום אירוע פרטי</h1>
-      <p class="muted">מוכרים בחצר? מעבירים סדנה בבית? ג'אם בסלון? ספרו לנו. האירוע יפורסם לאחר אישור הצוות.</p>
+      <p class="kicker">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+        שיתוף אירוע
+      </p>
+      <h1 class="page-title">פרסום אירוע קהילתי</h1>
+      <p class="lead">מוכרים בחצר? מעבירים סדנה בבית? ג'אם בסלון? ספרו לנו. האירוע יפורסם לאחר אישור הצוות.</p>
+
       <form id="post-form" novalidate>
-        <label>שם האירוע *<input name="title" required maxlength="120"></label>
-        <div class="row">
-          <label>תאריך *<input type="date" name="date" required></label>
-          <label>שעת התחלה *<input type="time" name="start" required></label>
-          <label>שעת סיום<input type="time" name="end"></label>
-        </div>
-        <label>כתובת או מקום *<input name="address" list="venue-list" required maxlength="160" placeholder="לדוגמה: רחוב הגפן 5, נחלאות"></label>
-        <datalist id="venue-list"></datalist>
         <div class="field">
-          <span>סמנו את המיקום על המפה *</span>
+          <div class="field-head"><label for="f-title">שם האירוע <b>*</b></label><span class="counter" data-for="f-title"></span></div>
+          <div class="input-wrap">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20 9 4l11 11-16 5zM14 4l1-2M18 7l2-1M17 10h3"/></svg>
+            <input id="f-title" name="title" required maxlength="120" placeholder="לדוגמה: ג'אם על הגג בנחלאות">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="f-date">תאריך <b>*</b></label>
+            <input id="f-date" type="date" name="date" required>
+          </div>
+          <div class="field">
+            <label for="f-start">שעת התחלה <b>*</b></label>
+            <input id="f-start" type="time" name="start" required>
+          </div>
+          <div class="field">
+            <label for="f-end">שעת סיום</label>
+            <input id="f-end" type="time" name="end">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="f-address">כתובת או מקום <b>*</b></label>
+          <div class="input-wrap">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+            <input id="f-address" name="address" list="venue-list" required maxlength="160" placeholder="לדוגמה: רחוב הגפן 5, נחלאות">
+          </div>
+          <datalist id="venue-list"></datalist>
+          <div class="quick-chips" id="venue-chips" aria-label="מקומות מוכרים"></div>
+        </div>
+
+        <div class="field">
+          <span class="label">סמנו את המיקום על המפה <b>*</b></span>
           <div id="pick-map" class="pick-map"></div>
-          <small class="warn">⚠️ הנקודה שתסמנו תוצג לכולם. אם זה בית פרטי, אפשר לסמן את קצה הרחוב במקום את הבית עצמו.</small>
+          <p class="hint">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20L12 3zM12 10v4M12 17h.01"/></svg>
+            הנקודה שתסמנו תוצג לכולם. אם זה בית פרטי, אפשר לסמן את קצה הרחוב במקום את הבית עצמו.
+          </p>
         </div>
-        <label>תיאור קצר *<textarea name="description" required maxlength="600" rows="4"></textarea></label>
+
+        <div class="field">
+          <div class="field-head"><label for="f-desc">תיאור קצר <b>*</b></label><span class="counter" data-for="f-desc"></span></div>
+          <textarea id="f-desc" name="description" required maxlength="600" rows="4" placeholder="מה כדאי להביא? (למשל: כרית, כלי נגינה, משהו לשתות)"></textarea>
+        </div>
+
         <fieldset class="field">
-          <legend>מחיר</legend>
-          <label class="inline"><input type="radio" name="price" value="free" checked> חינם</label>
-          <label class="inline"><input type="radio" name="price" value="paid"> בתשלום</label>
+          <legend class="label">כניסה</legend>
+          <div class="choice">
+            <label class="choice-tile">
+              <input type="radio" name="price" value="free" checked>
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12v8H4v-8M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7z"/></svg>
+              <span>חינם</span>
+            </label>
+            <label class="choice-tile">
+              <input type="radio" name="price" value="paid">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9a2 2 0 0 0 0 6v3h18v-3a2 2 0 0 1 0-6V6H3zM13 6v2M13 11v2M13 16v2"/></svg>
+              <span>בתשלום</span>
+            </label>
+          </div>
         </fieldset>
-        <div id="paid-fields" hidden>
-          <label>מחיר<input name="price_text" maxlength="40" placeholder="לדוגמה: 40 ₪"></label>
-          <label>קישור לתשלום (Bit / PayBox)<input type="url" name="payment_link" placeholder="https://"></label>
+        <div id="paid-fields" class="paid-fields" hidden>
+          <div class="field">
+            <label for="f-price">מחיר</label>
+            <input id="f-price" name="price_text" maxlength="40" placeholder="לדוגמה: 40 ₪">
+          </div>
+          <div class="field">
+            <label for="f-pay">קישור לתשלום (Bit / PayBox)</label>
+            <input id="f-pay" type="url" name="payment_link" placeholder="https://" dir="ltr">
+          </div>
         </div>
-        <label>טלפון או אימייל ליצירת קשר (לא יוצג באתר) *<input name="contact" required maxlength="120"></label>
-        <p id="form-error" class="error" hidden></p>
-        <button type="submit" class="btn btn-primary">שליחה לאישור</button>
+
+        <div class="field">
+          <div class="field-head"><label for="f-contact">טלפון או אימייל ליצירת קשר <b>*</b></label><span class="field-note">לא יוצג באתר</span></div>
+          <div class="input-wrap">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+            <input id="f-contact" name="contact" required maxlength="120">
+          </div>
+        </div>
+
+        <p id="form-error" class="error" role="alert" hidden></p>
+        <button type="submit" class="btn btn-primary btn-block btn-lg">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></svg>
+          שליחה לאישור
+        </button>
+        <p class="fineprint">האירוע יופיע באתר אחרי בדיקה קצרה של הצוות.</p>
       </form>
       <div id="post-done" class="done" hidden></div>
     </section>
   </main>
 
-  <footer class="footer">Gather · פרויקט קורס · <a href="#/post">יש לכם אירוע?</a></footer>
+  <nav class="bottom-nav" aria-label="ניווט ראשי">
+    <a href="#/" class="nav-item" data-nav="main">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5 5-2z"/></svg>
+      <span>גלו</span>
+    </a>
+    <a href="#/post" class="nav-item nav-item-cta" data-nav="post">
+      <span class="nav-cta" aria-hidden="true">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      </span>
+      <span>פרסום אירוע</span>
+    </a>
+  </nav>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <script src="js/config.js"></script>
