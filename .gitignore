@@ -2,6 +2,9 @@
 !/.gitignore
 !/CLAUDE.md
 !/README.md
+!/.claude/
+/.claude/*
+!/.claude/agents/
 !/UX UI/
 !/gather/
 gather/pipeline/out/
