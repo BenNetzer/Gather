@@ -349,30 +349,8 @@
     }
   }
 
-  // ---------- greeting ----------
-  // Hour in Jerusalem, so the greeting matches local time regardless of the device's time zone.
-  function jerusalemHour(d) {
-    const h = new Intl.DateTimeFormat("en-GB", {
-      hour: "numeric", hourCycle: "h23", timeZone: "Asia/Jerusalem",
-    }).format(d);
-    return parseInt(h, 10);
-  }
-
-  // 05:00–11:59 morning, 12:00–16:59 noon, otherwise evening.
-  function greetingFor(hour) {
-    if (hour >= 5 && hour < 12) return "בוקר טוב ☀️";
-    if (hour >= 12 && hour < 17) return "צהריים טובים 🌤️";
-    return "ערב טוב 🌙";
-  }
-
-  function updateGreeting() {
-    $("#greeting").textContent = greetingFor(jerusalemHour(new Date()));
-  }
-
   // ---------- boot ----------
   async function boot() {
-    updateGreeting();
-    setInterval(updateGreeting, 60 * 1000);
     $$(".chip").forEach((b) => b.addEventListener("click", () => {
       state.filter = b.dataset.filter;
       renderMain();
