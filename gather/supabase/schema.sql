@@ -82,3 +82,39 @@ grant insert (
 
 -- The pipeline (pipeline/publish.py) uses the service_role key: full access, RLS bypassed.
 grant all on public.events to service_role;
+
+-- ===========================================================================
+-- Contact form ("צרו קשר") — messages to the app owners
+--   anon: INSERT only (name, contact, topic, message). No SELECT / UPDATE / DELETE,
+--   so nobody can read other people's messages from the public site.
+--   Read them in Supabase → Table Editor → contact_messages.
+-- ===========================================================================
+create table if not exists public.contact_messages (
+  id          uuid        primary key default gen_random_uuid(),
+  name        text        not null check (char_length(name)    between 1 and 80),
+  contact     text        not null check (char_length(contact) between 3 and 120),
+  topic       text        not null default 'general'
+                          check (topic in ('general', 'suggestion', 'bug', 'event')),
+  message     text        not null check (char_length(message) between 1 and 2000),
+  handled     boolean     not null default false,
+  created_at  timestamptz not null default now()
+);
+
+create index if not exists contact_messages_created_idx on public.contact_messages (created_at desc);
+
+alter table public.contact_messages enable row level security;
+
+drop policy if exists "anon sends contact messages" on public.contact_messages;
+
+create policy "anon sends contact messages"
+  on public.contact_messages
+  for insert
+  to anon
+  with check (handled = false);
+
+revoke all on public.contact_messages from anon, authenticated;
+
+-- Write: exactly the fields submitContact() in js/data.js sends.
+grant insert (name, contact, topic, message) on public.contact_messages to anon;
+
+grant all on public.contact_messages to service_role;

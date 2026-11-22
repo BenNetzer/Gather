@@ -327,6 +327,56 @@
     $("#post-done").hidden = true;
   }
 
+  // ---------- contact form ----------
+  async function onContactSubmit(e) {
+    e.preventDefault();
+    const form = e.target;
+    const err = $("#contact-error");
+    const f = (n) => (form[n].value || "").trim();
+
+    if (f("website")) return; // honeypot filled → bot, silently drop
+
+    const problems = [];
+    if (!f("name")) problems.push("שם");
+    if (!f("contact")) problems.push("אימייל או טלפון");
+    if (!f("message")) problems.push("הודעה");
+    let msg = problems.length ? "חסרים: " + problems.join(", ") : "";
+    const c = f("contact");
+    if (!msg && !/^\S+@\S+\.\S+$/.test(c) && !/^[+\d][\d\s-]{7,}$/.test(c)) {
+      msg = "נא להזין אימייל או מספר טלפון תקינים.";
+    }
+    if (msg) { err.textContent = msg; err.hidden = false; return; }
+    err.hidden = true;
+
+    const btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    try {
+      await Data.submitContact({
+        name: f("name"), contact: c, topic: form.topic.value, message: f("message"),
+      });
+      form.hidden = true;
+      const done = $("#contact-done");
+      done.innerHTML = `<h2>תודה, ${esc(f("name"))}!</h2>
+        <p>ההודעה התקבלה. נחזור אליכם בהקדם.</p>
+        ${Data.useSupabase ? "" : '<p class="muted">(מצב הדגמה: ההודעה נשמרה רק בדפדפן הזה.)</p>'}
+        <a class="btn btn-primary" href="#/">חזרה לאירועים</a>`;
+      done.hidden = false;
+    } catch (ex) {
+      err.textContent = "השליחה נכשלה. נסו שוב בעוד רגע.";
+      err.hidden = false;
+      console.error(ex);
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function resetContactForm() {
+    const form = $("#contact-form");
+    if (!$("#contact-done").hidden) form.reset();
+    form.hidden = false;
+    $("#contact-done").hidden = true;
+  }
+
   // ---------- router ----------
   function show(id) {
     $$(".screen").forEach((s) => { s.hidden = s.id !== id; });
@@ -343,6 +393,9 @@
       resetPostForm();
       show("screen-post");
       ensurePickMap();
+    } else if (h === "#/contact") {
+      resetContactForm();
+      show("screen-contact");
     } else {
       show("screen-main");
       renderMain();
@@ -398,6 +451,7 @@
     }
     state.filter = defaultFilter();
     initPostForm();
+    $("#contact-form").addEventListener("submit", onContactSubmit);
     route();
   }
 

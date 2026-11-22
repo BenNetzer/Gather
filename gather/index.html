@@ -73,9 +73,34 @@
       </form>
       <div id="post-done" class="done" hidden></div>
     </section>
+
+    <!-- Contact form (messages to the app owners) -->
+    <section id="screen-contact" class="screen" hidden>
+      <a href="#/" class="back">→ חזרה</a>
+      <h1>צרו קשר</h1>
+      <p class="muted">שאלה, הצעה, תקלה או אירוע שפספסנו? כתבו לנו ונחזור אליכם.</p>
+      <form id="contact-form" novalidate>
+        <label>שם *<input name="name" required maxlength="80" autocomplete="name"></label>
+        <label>אימייל או טלפון לחזרה *<input name="contact" required maxlength="120" autocomplete="email"></label>
+        <label>נושא
+          <select name="topic">
+            <option value="general">שאלה כללית</option>
+            <option value="suggestion">הצעה / רעיון</option>
+            <option value="bug">דיווח על תקלה</option>
+            <option value="event">אירוע / מקום שחסר באתר</option>
+          </select>
+        </label>
+        <label>הודעה *<textarea name="message" required maxlength="2000" rows="5"></textarea></label>
+        <!-- Honeypot: hidden from people, bots tend to fill it -->
+        <label class="hp" aria-hidden="true">אתר<input name="website" tabindex="-1" autocomplete="off"></label>
+        <p id="contact-error" class="error" hidden></p>
+        <button type="submit" class="btn btn-primary">שליחה</button>
+      </form>
+      <div id="contact-done" class="done" hidden></div>
+    </section>
   </main>
 
-  <footer class="footer">Gather · פרויקט קורס · <a href="#/post">יש לכם אירוע?</a></footer>
+  <footer class="footer">Gather · פרויקט קורס · <a href="#/post">יש לכם אירוע?</a> · <a href="#/contact">צרו קשר</a></footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <script src="js/config.js"></script>
