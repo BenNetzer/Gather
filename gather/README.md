@@ -75,6 +75,15 @@ Demo mode needs no account and is fine for development and presentations.
 
 The Table Editor runs with admin rights, so it isn't restricted by row-level security.
 
+## Contact form
+
+The "צרו קשר" page (`#/contact`, linked from the footer) lets visitors send a message to the team.
+
+- **Supabase mode:** messages are inserted into the `contact_messages` table (created by
+  `supabase/schema.sql`). The public key can only insert; nobody can read messages from the site.
+  Read them in **Table Editor → contact_messages** and set `handled` to `true` once answered.
+- **Demo mode:** messages are kept in this browser only (`localStorage` key `gather_contact`).
+
 ## Event pipeline
 
 Collected events (`origin = collected`) are added in three steps, run in this order; see the

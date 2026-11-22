@@ -25,9 +25,9 @@ python -m http.server 8765 --directory gather
 
 | Path | Role |
 |---|---|
-| `gather/index.html` | Single page; hash routes `#/` (list + map), `#/event/<id>`, `#/post` |
+| `gather/index.html` | Single page; hash routes `#/` (list + map), `#/event/<id>`, `#/post`, `#/contact` |
 | `gather/js/config.js` | `GATHER_CONFIG.SUPABASE_URL` / `SUPABASE_ANON_KEY`; empty = demo mode |
-| `gather/js/data.js` | `GatherData`: `loadEvents`, `loadVenues`, `submitPrivate` |
+| `gather/js/data.js` | `GatherData`: `loadEvents`, `loadVenues`, `submitPrivate`, `submitContact` |
 | `gather/js/dates.js`, `gather/js/app.js` | Date helpers; UI, filters, map, post form, router |
 | `gather/data/events.json` | Events for demo mode |
 | `gather/data/venues.json` | Venues with `name`, `aliases`, `address`, `lat`, `lng` |
@@ -59,6 +59,8 @@ poster_contact, created_at`.
   (`status` → `active`).
 - The `service_role` key is used only by `pipeline/publish.py` from the local environment.
   Never put it in `js/config.js`, any file under `gather/` that is served, or anything committed.
+- `contact_messages` (contact form): anon may INSERT only `name, contact, topic, message`;
+  no anon SELECT/UPDATE/DELETE. Team reads it in the Table Editor and sets `handled`.
 - Render untrusted text with `esc()` and links through `safeUrl()` in `app.js`.
 
 ## Pipeline

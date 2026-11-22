@@ -69,5 +69,26 @@ window.GatherData = (function () {
     return { demo: true, row };
   }
 
-  return { useSupabase, loadEvents, loadVenues, submitPrivate };
+  // Contact form → contact_messages table (anon may INSERT only, never read back).
+  async function submitContact(msg) {
+    const row = { name: msg.name, contact: msg.contact, topic: msg.topic, message: msg.message };
+    if (useSupabase) {
+      const res = await fetch(`${cfg.SUPABASE_URL}/rest/v1/contact_messages`, {
+        method: "POST",
+        headers: sbHeaders({ Prefer: "return=minimal" }),
+        body: JSON.stringify(row),
+      });
+      if (!res.ok) throw new Error("Supabase " + res.status + ": " + (await res.text()));
+      return { demo: false };
+    }
+    try {
+      const key = "gather_contact";
+      const list = JSON.parse(localStorage.getItem(key) || "[]");
+      list.push(Object.assign({ created_at: new Date().toISOString() }, row));
+      localStorage.setItem(key, JSON.stringify(list));
+    } catch (e) { /* storage unavailable — demo only */ }
+    return { demo: true, row };
+  }
+
+  return { useSupabase, loadEvents, loadVenues, submitPrivate, submitContact };
 })();
