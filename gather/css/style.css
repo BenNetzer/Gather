@@ -84,6 +84,9 @@ main { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; }
 .topbar .btn { min-height: 36px; font-size: 14px; padding: 0 12px; }
 .btn:disabled { opacity: .6; cursor: wait; }
 
+/* Greeting */
+.greeting { margin: 16px 0 0; font-size: 20px; font-weight: 700; color: var(--text); }
+
 /* Controls */
 .controls {
   position: sticky; top: var(--header-h); z-index: 900;
